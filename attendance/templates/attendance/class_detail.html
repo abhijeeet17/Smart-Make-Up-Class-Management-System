@@ -1,0 +1,196 @@
+{% extends 'attendance/base.html' %}
+{% block title %}{{ cls.subject }} - LPU Campus{% endblock %}
+
+{% block extra_head %}
+<style>
+.code-pulse {
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(243,156,18,0.4); }
+    50% { box-shadow: 0 0 0 15px rgba(243,156,18,0); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-start">
+    <div>
+        <h4 class="mb-0 fw-bold"><i class="bi bi-calendar-event me-2" style="color:#8B1A1A;"></i>{{ cls.subject }}</h4>
+        {% if cls.topic %}<p class="mb-0 text-muted">{{ cls.topic }}</p>{% endif %}
+        <div class="mt-1">
+            <span class="badge badge-{{ cls.status }} text-white me-2">{{ cls.get_status_display }}</span>
+            <small class="text-muted">
+                <i class="bi bi-calendar3 me-1"></i>{{ cls.date|date:"l, d F Y" }} &nbsp;|&nbsp;
+                <i class="bi bi-clock me-1"></i>{{ cls.start_time|time:"h:i A" }} – {{ cls.end_time|time:"h:i A" }} &nbsp;|&nbsp;
+                <i class="bi bi-geo-alt me-1"></i>{{ cls.venue }}
+            </small>
+        </div>
+    </div>
+    {% if role == 'faculty' %}
+    <div class="d-flex gap-2">
+        <a href="{% url 'edit_class' cls.pk %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-pencil me-1"></i>Edit
+        </a>
+        <a href="{% url 'delete_class' cls.pk %}" class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-trash me-1"></i>Delete
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    {% if role == 'faculty' %}
+    <!-- ── REMEDIAL CODE PANEL ── -->
+    <div class="col-md-5">
+        <div class="card h-100">
+            <div class="card-header-lpu">
+                <i class="bi bi-key-fill me-2"></i>Remedial Code Manager
+            </div>
+            <div class="card-body text-center">
+                {% if active_code and active_code.is_valid %}
+                <!-- Code is active -->
+                <div class="mb-3">
+                    <p class="text-muted mb-2">Active Code — Share with students:</p>
+                    <div class="remedial-code-box code-pulse mb-3">{{ active_code.code }}</div>
+                    <div id="countdown-timer" class="mb-3">
+                        <i class="bi bi-alarm me-1"></i>Expires in: <span id="timer-display">--:--</span>
+                    </div>
+                    <small class="text-muted d-block mb-3">Expires: {{ active_code.expires_at|date:"d M Y, h:i A" }}</small>
+                </div>
+                <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="deactivate_code">
+                    <button class="btn btn-danger btn-sm" onclick="return confirm('Deactivate this code?')">
+                        <i class="bi bi-x-circle me-1"></i>Deactivate Code
+                    </button>
+                </form>
+
+                {% else %}
+                <!-- No active code -->
+                <div class="mb-4">
+                    <i class="bi bi-key text-muted" style="font-size:3rem;"></i>
+                    <p class="text-muted mt-2">No active remedial code. Generate one for students to mark their attendance.</p>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="generate_code">
+                    <div class="mb-3 text-start">
+                        <label class="form-label fw-semibold">Code valid duration:</label>
+                        <select name="duration_minutes" class="form-select">
+                            <option value="15">15 minutes</option>
+                            <option value="30" selected>30 minutes</option>
+                            <option value="60">1 hour</option>
+                            <option value="120">2 hours</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-lpu btn-primary w-100">
+                        <i class="bi bi-plus-circle me-2"></i>Generate Remedial Code
+                    </button>
+                </form>
+                {% endif %}
+
+                <hr>
+                <!-- Class status controls -->
+                <div class="d-flex gap-2 justify-content-center flex-wrap">
+                    {% if cls.status == 'upcoming' %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="activate_class">
+                        <button class="btn btn-success btn-sm"><i class="bi bi-play-circle me-1"></i>Start Class</button>
+                    </form>
+                    {% elif cls.status == 'active' %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="complete_class">
+                        <button class="btn btn-warning btn-sm"><i class="bi bi-stop-circle me-1"></i>Complete Class</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── ATTENDANCE LIST ── -->
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header-lpu d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-people-fill me-2"></i>Attendance Records</span>
+                <span class="badge bg-light text-dark">{{ attendance_records.count }} students</span>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-lpu">
+                        <tr><th>#</th><th>Student</th><th>Marked At</th><th>Code Used</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for rec in attendance_records %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <strong>{{ rec.student.get_full_name|default:rec.student.username }}</strong>
+                                {% if rec.student.profile.registration_number %}
+                                <br><small class="text-muted">{{ rec.student.profile.registration_number }}</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ rec.marked_at|date:"d M, h:i A" }}</td>
+                            <td>
+                                {% if rec.remedial_code_used %}
+                                <code class="text-success">{{ rec.remedial_code_used.code }}</code>
+                                {% else %}<span class="text-muted">—</span>{% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                <i class="bi bi-people d-block mb-2" style="font-size:2rem;"></i>
+                                No students have marked attendance yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5>{{ cls.subject }}</h5>
+                <p class="text-muted">{{ cls.date }} | {{ cls.venue }}</p>
+                <a href="{% url 'mark_attendance' %}" class="btn btn-lpu btn-primary">Mark Attendance</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if active_code and active_code.is_valid %}
+<script>
+const expiresAt = new Date("{{ active_code.expires_at|date:'c' }}");
+const codeId = {{ active_code.pk }};
+
+function updateTimer() {
+    const now = new Date();
+    const diff = Math.max(0, Math.floor((expiresAt - now) / 1000));
+    const m = Math.floor(diff / 60).toString().padStart(2, '0');
+    const s = (diff % 60).toString().padStart(2, '0');
+    const el = document.getElementById('timer-display');
+    const timerEl = document.getElementById('countdown-timer');
+    if (el) {
+        el.textContent = `${m}:${s}`;
+        if (diff <= 60) timerEl.classList.add('danger');
+        if (diff === 0) {
+            el.textContent = "Expired";
+            setTimeout(() => location.reload(), 1500);
+        }
+    }
+}
+updateTimer();
+setInterval(updateTimer, 1000);
+</script>
+{% endif %}
+{% endblock %}

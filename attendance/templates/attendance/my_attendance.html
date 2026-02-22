@@ -1,0 +1,74 @@
+{% extends 'attendance/base.html' %}
+{% block title %}My Attendance - LPU Campus{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h4 class="mb-0 fw-bold"><i class="bi bi-card-checklist me-2" style="color:#8B1A1A;"></i>My Make-Up Class Attendance</h4>
+        <small class="text-muted">Separate record maintained for all make-up / remedial classes attended</small>
+    </div>
+    <div>
+        <span class="badge fs-6 px-3 py-2" style="background:#8B1A1A;">
+            <i class="bi bi-patch-check me-1"></i>{{ total }} Classes Attended
+        </span>
+    </div>
+</div>
+
+{% if records %}
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-lpu">
+                <tr>
+                    <th>#</th>
+                    <th>Subject</th>
+                    <th>Topic</th>
+                    <th>Faculty</th>
+                    <th>Class Date</th>
+                    <th>Venue</th>
+                    <th>Marked At</th>
+                    <th>Code Used</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rec in records %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><strong>{{ rec.makeup_class.subject }}</strong></td>
+                    <td><small class="text-muted">{{ rec.makeup_class.topic|default:"—" }}</small></td>
+                    <td>{{ rec.makeup_class.faculty.get_full_name }}</td>
+                    <td>{{ rec.makeup_class.date|date:"d M Y" }}</td>
+                    <td>{{ rec.makeup_class.venue }}</td>
+                    <td>{{ rec.marked_at|date:"d M, h:i A" }}</td>
+                    <td>
+                        {% if rec.remedial_code_used %}
+                        <code class="text-success fw-bold">{{ rec.remedial_code_used.code }}</code>
+                        {% else %}<span class="text-muted">—</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if rec.is_present %}
+                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Present</span>
+                        {% else %}
+                        <span class="badge bg-danger">Absent</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-calendar-x d-block mb-3" style="font-size:4rem; color:#ddd;"></i>
+        <h5 class="text-muted">No make-up class attendance yet</h5>
+        <p class="text-muted">When you attend a make-up class and mark your attendance using a remedial code, it will appear here.</p>
+        <a href="{% url 'mark_attendance' %}" class="btn btn-lpu btn-primary mt-2">
+            <i class="bi bi-qr-code-scan me-2"></i>Mark Attendance Now
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

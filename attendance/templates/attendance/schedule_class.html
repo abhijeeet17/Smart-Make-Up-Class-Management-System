@@ -1,0 +1,79 @@
+{% extends 'attendance/base.html' %}
+{% block title %}{% if editing %}Edit{% else %}Schedule{% endif %} Make-Up Class - LPU Campus{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h4 class="mb-0 fw-bold">
+        <i class="bi bi-{% if editing %}pencil{% else %}plus-circle{% endif %} me-2" style="color:#8B1A1A;"></i>
+        {% if editing %}Edit Make-Up Class{% else %}Schedule New Make-Up Class{% endif %}
+    </h4>
+    <small class="text-muted">Fill in the details for the remedial/make-up session</small>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Subject <span class="text-danger">*</span></label>
+                            <input type="text" name="subject" class="form-control"
+                                   value="{{ form.subject.value|default:'' }}"
+                                   placeholder="e.g. Data Structures & Algorithms" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Topic</label>
+                            <input type="text" name="topic" class="form-control"
+                                   value="{{ form.topic.value|default:'' }}"
+                                   placeholder="e.g. Binary Trees - Revision">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Date <span class="text-danger">*</span></label>
+                            <input type="date" name="date" class="form-control"
+                                   value="{{ form.date.value|default:'' }}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Start Time <span class="text-danger">*</span></label>
+                            <input type="time" name="start_time" class="form-control"
+                                   value="{{ form.start_time.value|default:'' }}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">End Time <span class="text-danger">*</span></label>
+                            <input type="time" name="end_time" class="form-control"
+                                   value="{{ form.end_time.value|default:'' }}" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Venue <span class="text-danger">*</span></label>
+                        <input type="text" name="venue" class="form-control"
+                               value="{{ form.venue.value|default:'' }}"
+                               placeholder="e.g. Room 301, Block 32" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Description / Notes</label>
+                        <textarea name="description" class="form-control" rows="3"
+                                  placeholder="Any additional info for students...">{{ form.description.value|default:'' }}</textarea>
+                    </div>
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        {% for field, errs in form.errors.items %}{% for e in errs %}<div>{{ e }}</div>{% endfor %}{% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-lpu btn-primary px-4">
+                            <i class="bi bi-check-circle me-2"></i>{% if editing %}Save Changes{% else %}Schedule Class{% endif %}
+                        </button>
+                        <a href="{% url 'faculty_classes' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

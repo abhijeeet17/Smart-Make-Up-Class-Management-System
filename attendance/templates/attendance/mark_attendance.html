@@ -1,0 +1,107 @@
+{% extends 'attendance/base.html' %}
+{% block title %}Mark Attendance - LPU Campus{% endblock %}
+
+{% block extra_head %}
+<style>
+.code-input-wrapper {
+    position: relative;
+    display: inline-block;
+}
+.code-display {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 1.5rem 0;
+}
+.code-char {
+    width: 55px; height: 70px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; font-weight: 700; font-family: monospace;
+    background: #fafafa;
+    transition: all 0.2s;
+    color: #8B1A1A;
+}
+.code-char.filled { border-color: #8B1A1A; background: #fff5f5; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h4 class="mb-0 fw-bold">
+        <i class="bi bi-qr-code-scan me-2" style="color:#8B1A1A;"></i>Mark Make-Up Class Attendance
+    </h4>
+    <small class="text-muted">Enter the 6-character remedial code given by your faculty</small>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body p-5 text-center">
+                <i class="bi bi-keyboard text-muted mb-3 d-block" style="font-size:3rem;"></i>
+                <h5 class="fw-bold mb-1">Enter Remedial Code</h5>
+                <p class="text-muted small mb-4">The code is displayed by your faculty during the make-up class</p>
+
+                <!-- Visual code display boxes -->
+                <div class="code-display" id="codeDisplay">
+                    <div class="code-char" id="c0"></div>
+                    <div class="code-char" id="c1"></div>
+                    <div class="code-char" id="c2"></div>
+                    <div class="code-char" id="c3"></div>
+                    <div class="code-char" id="c4"></div>
+                    <div class="code-char" id="c5"></div>
+                </div>
+
+                <form method="post" id="attendanceForm">
+                    {% csrf_token %}
+                    <input type="text" name="code" id="codeInput"
+                           class="form-control form-control-lg text-center fw-bold mb-4"
+                           maxlength="6" placeholder="e.g. AB1C2D"
+                           style="text-transform:uppercase; letter-spacing:6px; font-size:1.5rem; font-family:monospace;"
+                           autocomplete="off" autofocus required>
+
+                    <button type="submit" class="btn btn-lpu btn-primary btn-lg px-5 w-100">
+                        <i class="bi bi-check-circle me-2"></i>Mark My Attendance
+                    </button>
+                </form>
+
+                <div class="mt-4 p-3 rounded" style="background:#f8f9fa;">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Each code is valid only for the duration set by your faculty. You can only mark attendance once per class.
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="{% url 'my_attendance' %}" class="text-decoration-none text-muted">
+                <i class="bi bi-list-check me-1"></i>View My Attendance Records
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const input = document.getElementById('codeInput');
+const boxes = Array.from({length: 6}, (_, i) => document.getElementById(`c${i}`));
+
+input.addEventListener('input', () => {
+    const val = input.value.toUpperCase();
+    input.value = val;
+    boxes.forEach((box, i) => {
+        box.textContent = val[i] || '';
+        box.classList.toggle('filled', !!val[i]);
+    });
+});
+
+input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && input.value.length === 6) {
+        document.getElementById('attendanceForm').submit();
+    }
+});
+</script>
+{% endblock %}

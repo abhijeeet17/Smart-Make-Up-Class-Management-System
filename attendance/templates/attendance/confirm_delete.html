@@ -1,0 +1,30 @@
+{% extends 'attendance/base.html' %}
+{% block title %}Confirm Delete - LPU Campus{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card border-danger">
+            <div class="card-body text-center p-5">
+                <i class="bi bi-exclamation-triangle-fill text-danger d-block mb-3" style="font-size:3.5rem;"></i>
+                <h4 class="fw-bold">Delete Make-Up Class?</h4>
+                <p class="text-muted">You are about to permanently delete:</p>
+                <div class="p-3 rounded mb-4" style="background:#fff5f5; border: 1px solid #f5c6cb;">
+                    <strong>{{ cls.subject }}</strong><br>
+                    <small class="text-muted">{{ cls.date|date:"d M Y" }} | {{ cls.venue }}</small>
+                </div>
+                <p class="text-danger small">This will also delete all attendance records and remedial codes for this class.</p>
+                <div class="d-flex gap-3 justify-content-center mt-3">
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="bi bi-trash me-2"></i>Yes, Delete
+                        </button>
+                    </form>
+                    <a href="{% url 'class_detail' cls.pk %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

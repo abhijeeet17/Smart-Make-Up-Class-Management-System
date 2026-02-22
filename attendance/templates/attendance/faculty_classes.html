@@ -1,0 +1,77 @@
+{% extends 'attendance/base.html' %}
+{% block title %}My Make-Up Classes - LPU Campus{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h4 class="mb-0 fw-bold"><i class="bi bi-calendar-week me-2" style="color:#8B1A1A;"></i>My Make-Up Classes</h4>
+        <small class="text-muted">Manage all your scheduled make-up / remedial classes</small>
+    </div>
+    <a href="{% url 'schedule_class' %}" class="btn btn-lpu btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>Schedule New Class
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-lpu">
+                <tr>
+                    <th>Subject / Topic</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Venue</th>
+                    <th>Status</th>
+                    <th>Attendance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cls in classes %}
+                <tr>
+                    <td>
+                        <strong>{{ cls.subject }}</strong>
+                        {% if cls.topic %}<br><small class="text-muted">{{ cls.topic }}</small>{% endif %}
+                    </td>
+                    <td>{{ cls.date|date:"d M Y" }}</td>
+                    <td>
+                        <small>{{ cls.start_time|time:"h:i A" }}<br>{{ cls.end_time|time:"h:i A" }}</small>
+                    </td>
+                    <td>{{ cls.venue }}</td>
+                    <td>
+                        <span class="badge badge-{{ cls.status }} text-white">{{ cls.get_status_display }}</span>
+                        {% if cls.get_active_code and cls.get_active_code.is_valid %}
+                        <br><small class="text-success"><i class="bi bi-circle-fill" style="font-size:0.5rem;"></i> Code Live</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary">{{ cls.total_attendance }} students</span>
+                    </td>
+                    <td>
+                        <a href="{% url 'class_detail' cls.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'edit_class' cls.pk %}" class="btn btn-sm btn-outline-secondary me-1">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'delete_class' cls.pk %}" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <i class="bi bi-calendar-x d-block mb-2" style="font-size:3rem; color:#ccc;"></i>
+                        <p class="text-muted mb-3">No make-up classes scheduled yet.</p>
+                        <a href="{% url 'schedule_class' %}" class="btn btn-lpu btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Schedule Your First Class
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
