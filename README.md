@@ -1,175 +1,161 @@
-🎓 LPU Smart Campus Management System
-Smart Make-Up & Remedial Class Management Platform
+🎓 Smart Make-Up Class Management System
+🚀 Digitizing Remedial Attendance with Secure Expiring Codes
 
-Course: Python and Full Stack
-Project: Project II
-Framework: Django
-Database: SQLite
+A Django-based web application built to modernize and automate the management of make-up and remedial classes in universities.
+
+Instead of paper signatures and manual tracking, this system generates time-bound secure attendance codes that ensure real-time validation and prevent proxy attendance.
 
 📌 Project Overview
 
-The LPU Smart Campus Management System is a web-based platform designed to digitize and streamline the management of Make-Up and Remedial Classes at Lovely Professional University.
+Large universities often struggle with unstructured remedial class tracking. Faculty manually record attendance, and there is no validation mechanism.
 
-Traditional remedial attendance systems rely on manual tracking and paper signatures. This system replaces that process with a secure, time-bound remedial code system, ensuring real-time validation and structured record keeping.
+🔎 This project solves that problem by:
 
-🚀 Core Features
+Generating unique session-based attendance codes
+
+Enforcing expiry-based validation
+
+Preventing duplicate attendance entries
+
+Providing real-time tracking dashboards
+
+✨ Core Features
 👩‍🏫 Faculty Portal
 
-Schedule make-up / remedial classes
+Create and schedule make-up/remedial classes
 
-Generate unique 6-character remedial codes per session
+Generate unique 6-character alphanumeric codes
 
-Set code expiry duration (15 min / 30 min / 1 hr / 2 hrs)
+Set custom expiry durations (15 min / 30 min / 1 hr / 2 hrs)
 
-View real-time student attendance
+View real-time attendance data
 
-Manage class lifecycle (Upcoming → Active → Completed)
+Edit or delete scheduled classes
 
-Edit and delete classes
+👨‍🎓 Student Portal
 
-🎓 Student Portal
+Enter remedial code to mark attendance
 
-Mark attendance using remedial code
+Prevent duplicate attendance submissions
 
-Prevent duplicate attendance marking
+View attendance history
 
-View complete make-up attendance history
+Instant validation feedback (Valid / Expired / Invalid)
 
-User-friendly 6-box visual code entry UI
+🔐 Security & Validation Layer
 
-🔐 Admin Panel
+✔ Code must exist
+✔ Code must not be expired
+✔ Student must not have already marked attendance
+✔ Session must be active
 
-Full system access via Django Admin
+This ensures data integrity and academic transparency.
 
-Manage users, classes, and attendance records
+🛠 Tech Stack
+🔹 Backend
 
-🛠️ Tech Stack
-Layer	Technology
-Backend	Django (Python)
-Database	SQLite
-Authentication	Django Auth System
-Frontend	HTML, CSS, Bootstrap
-Real-Time Features	AJAX + JSON Responses
-⚙️ How to Run the Project
-1️⃣ Clone the Repository
-git clone https://github.com/abhijeeet17/Smart-Make-Up-Class-Management-System.git
-cd Smart-Make-Up-Class-Management-System
-2️⃣ Create Virtual Environment (Recommended)
-python -m venv venv
-venv\Scripts\activate
-3️⃣ Install Dependencies
-pip install -r requirements.txt
-4️⃣ Apply Migrations (Creates SQLite Database)
-python manage.py makemigrations
-python manage.py migrate
-5️⃣ Create Superuser
-python manage.py createsuperuser
-6️⃣ Run Development Server
-python manage.py runserver
-7️⃣ Open in Browser
-http://127.0.0.1:8000/
-📂 Project Structure
-lpu_campus/
+Python + Django
+
+🔹 Database
+
+SQLite (default Django DB)
+
+🔹 Frontend
+
+HTML + CSS + Bootstrap
+
+🔹 Authentication
+
+Django Built-in Authentication System
+
+🔹 Dynamic Features
+
+AJAX + JSON for real-time validation
+
+⚙️ How the System Works
+Step 1️⃣ – Faculty Creates Session
+
+A remedial class session is scheduled in the system.
+
+Step 2️⃣ – Unique Code Generation
+
+A secure 6-character alphanumeric code is generated.
+
+Step 3️⃣ – Student Marks Attendance
+
+Students enter the code in the portal.
+
+Step 4️⃣ – Backend Validation
+
+The system checks:
+
+Expiry timestamp
+
+Duplicate entry
+
+Valid session
+
+If valid → Attendance recorded
+If invalid → Error message displayed
+
+🧩 Project Structure
+Smart-Make-Up-Class-Management-System/
 │
-├── lpu_campus/                # Django project configuration
-│   ├── settings.py            # App settings (SQLite, installed apps)
-│   ├── urls.py                # Root URL configuration
-│   └── wsgi.py
-│
-├── attendance/                # Main application
-│   ├── models.py              # UserProfile, MakeUpClass, RemedialCode, MakeUpAttendance
-│   ├── views.py               # Authentication + portal logic
-│   ├── forms.py               # Django ModelForms
-│   ├── urls.py                # App URL patterns
-│   ├── admin.py               # Admin registrations
-│   └── templates/
-│       └── attendance/
-│           ├── base.html
-│           ├── login.html
-│           ├── register.html
-│           ├── dashboard.html
-│           ├── faculty_classes.html
-│           ├── schedule_class.html
-│           ├── class_detail.html
-│           ├── mark_attendance.html
-│           ├── my_attendance.html
-│           └── confirm_delete.html
+├── attendance/                 # Core Django app
+│   ├── models.py               # Database models
+│   ├── views.py                # Business logic
+│   ├── forms.py                # Form handling
+│   ├── urls.py                 # Routing
+│   └── templates/attendance/   # Frontend templates
 │
 ├── manage.py
 ├── requirements.txt
 └── README.md
-🔑 Remedial Code System – Workflow
+▶️ How to Run Locally
+1️⃣ Clone the Repository
+git clone https://github.com/abhijeeet17/Smart-Make-Up-Class-Management-System.git
+cd Smart-Make-Up-Class-Management-System
+2️⃣ Create Virtual Environment
+python -m venv venv
 
-Faculty schedules a make-up class.
+Activate:
 
-On the session day, faculty generates a remedial code.
+Windows
 
-System creates a unique 6-character alphanumeric code (e.g., AB1C2D).
+venv\Scripts\activate
 
-The code has a defined expiry time.
+Mac/Linux
 
-Students enter the code in the attendance portal.
+source venv/bin/activate
+3️⃣ Install Dependencies
+pip install -r requirements.txt
+4️⃣ Run Migrations
+python manage.py makemigrations
+python manage.py migrate
+5️⃣ Create Superuser
+python manage.py createsuperuser
+6️⃣ Start Server
+python manage.py runserver
 
-System validates:
+Open in browser:
 
-Code exists
-
-Code is active
-
-Code is not expired
-
-Student has not already marked attendance
-
-Attendance is stored in a separate table (MakeUpAttendance).
-
-Faculty can view attendance in real-time.
-
-🧠 Django & Python Concepts Implemented
-
-Django ORM (Models, ForeignKey, OneToOneField)
-
-User role extension using UserProfile
-
-ModelForms with custom validation (clean())
-
-Django Authentication (login, logout, @login_required)
-
-Django Messages Framework
-
-Timezone-aware expiry using timezone.now()
-
-Secure code generation using random.choices()
-
-AJAX with JsonResponse for live countdown
-
-Django Admin customization
-
-👥 User Roles
-Role	Permissions
-Faculty	Schedule classes, generate codes, view attendance
-Student	Mark attendance, view own records
-Admin	Full system control via /admin/
+http://127.0.0.1:8000/
 🎯 Problem Solved
 
-✔ Eliminates paper-based attendance
+✔ Eliminates manual attendance sheets
 ✔ Prevents proxy attendance
-✔ Ensures time-bound validation
-✔ Provides structured make-up attendance records
-✔ Enables real-time faculty monitoring
+✔ Enforces time-based validation
+✔ Centralizes remedial session management
+✔ Improves institutional efficiency
 
-📌 Future Enhancements
+📈 Future Enhancements
 
-QR-based attendance marking
+📱 QR-based attendance marking
 
-SMS / Email code sharing
+📊 Analytics dashboard
 
-Analytics dashboard (attendance insights)
+☁️ Cloud deployment
 
-Deployment on cloud (AWS / Render / Railway)
+📤 Email/SMS code notification
 
-Integration with main university ERP
-
-👨‍💻 Developed For
-
-Lovely Professional University
-Project II – Python and Full Stack
+🔗 ERP integration
